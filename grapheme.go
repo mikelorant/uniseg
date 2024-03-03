@@ -227,7 +227,7 @@ func FirstGraphemeCluster(b []byte, state int) (cluster, rest []byte, width, new
 		} else {
 			prop = state >> shiftGraphemePropState
 		}
-		return b, nil, runeWidth(r, prop), grAny | (prop << shiftGraphemePropState)
+		return b, nil, overrideWidth(string(b), runeWidth(r, prop)), grAny | (prop << shiftGraphemePropState)
 	}
 
 	// If we don't know the state, determine it now.
@@ -250,7 +250,7 @@ func FirstGraphemeCluster(b []byte, state int) (cluster, rest []byte, width, new
 		state, prop, boundary = transitionGraphemeState(state&maskGraphemeState, r)
 
 		if boundary {
-			return b[:length], b[length:], width, state | (prop << shiftGraphemePropState)
+			return b[:length], b[length:], overrideWidth(string(b[:length]), width), state | (prop << shiftGraphemePropState)
 		}
 
 		if firstProp == prExtendedPictographic {
@@ -265,7 +265,7 @@ func FirstGraphemeCluster(b []byte, state int) (cluster, rest []byte, width, new
 
 		length += l
 		if len(b) <= length {
-			return b, nil, width, grAny | (prop << shiftGraphemePropState)
+			return b, nil, overrideWidth(string(b), width), grAny | (prop << shiftGraphemePropState)
 		}
 	}
 }
@@ -287,7 +287,7 @@ func FirstGraphemeClusterInString(str string, state int) (cluster, rest string, 
 		} else {
 			prop = state >> shiftGraphemePropState
 		}
-		return str, "", runeWidth(r, prop), grAny | (prop << shiftGraphemePropState)
+		return str, "", overrideWidth(str, runeWidth(r, prop)), grAny | (prop << shiftGraphemePropState)
 	}
 
 	// If we don't know the state, determine it now.
@@ -310,7 +310,7 @@ func FirstGraphemeClusterInString(str string, state int) (cluster, rest string, 
 		state, prop, boundary = transitionGraphemeState(state&maskGraphemeState, r)
 
 		if boundary {
-			return str[:length], str[length:], width, state | (prop << shiftGraphemePropState)
+			return str[:length], str[length:], overrideWidth(str[:length], width), state | (prop << shiftGraphemePropState)
 		}
 
 		if firstProp == prExtendedPictographic {
@@ -325,7 +325,7 @@ func FirstGraphemeClusterInString(str string, state int) (cluster, rest string, 
 
 		length += l
 		if len(str) <= length {
-			return str, "", width, grAny | (prop << shiftGraphemePropState)
+			return str, "", overrideWidth(str, width), grAny | (prop << shiftGraphemePropState)
 		}
 	}
 }
